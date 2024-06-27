@@ -5,6 +5,6 @@ pip install cruft
 ```
 
 ```
-cruft create https://github.com/raybellwaves/github-issue-explorer
+cruft create git@github.com:raybellwaves/github-issue-explorer.git
 ```
 
