@@ -1,6 +1,6 @@
-ORG = "{{ cookiecutter.github_organization }}"
-REPO = "{{ cookiecutter.github_repository }}"
-LLM_FRAMEWORK = "{{ cookiecutter.llm_framework }}"
+ORG = "{{cookiecutter.github_organization}}"
+REPO = "{{cookiecutter.github_repository}}"
+LLM_FRAMEWORK = "{{cookiecutter.llm_framework}}"
 
 BOTS = [
     "GPUtester",
