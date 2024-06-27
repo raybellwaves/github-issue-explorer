@@ -1,0 +1,5 @@
+{
+    "github_organization": "Name of the GitHub organization the repository is associatd with",
+    "github_repository": "Name of the GitHub repository",
+    "llm_framework": "mistral (there may be others in the future)"
+}
