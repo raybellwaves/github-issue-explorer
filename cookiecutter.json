@@ -1,8 +1,6 @@
 {
-    "full_name": "Timothy Crosley",
-    "email": "timothy.crosley@gmail.com",
-    "github_username": "timothycrosley",
-    "project_name": "python_project_name",
-    "description": "Project short description.",
-    "version": "0.0.1"
+    "github_organization": "Name of the GitHub organization the repository is associatd with",
+    "github_repository": "Name of the GitHub repository",
+    "llm_framework": "mistral (there may be others in the future)",
+    "repository_name": "{{cookiecutter.github_repository}}-issue-explorer"
 }
