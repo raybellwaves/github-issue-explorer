@@ -136,7 +136,9 @@ def scrape_gh(
                         detail_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}"
                         if verbose:
                             print(detail_url)
-                        detail_response = requests.get(detail_url, headers=headers)
+                        detail_response = requests.get(
+                            detail_url, headers=headers, timeout=10
+                        )
                         if not status_code_checks(detail_response.status_code):
                             break
                         detail_response_json = detail_response.json()
