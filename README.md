@@ -34,5 +34,15 @@ conda remove --name gie --all --y
 
 ```
 cd {{cookiecutter.github_repository}}-issue-explorer
-python main.py --verbose True
+python main.py --states open --content_types issues --verbose True
 ```
+
+## TODO
+
+ - Could include timeline API which links issues/PRs
+ - Haven't done anything with PR data
+
+ ## See also
+
+ - https://devlake.apache.org/
+ - https://github.com/dlvhdr/gh-dash

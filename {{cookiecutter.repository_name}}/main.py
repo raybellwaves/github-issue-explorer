@@ -27,7 +27,7 @@ def status_code_checks(status_code: int) -> bool:
     if status_code == 200:
         return True
     elif status_code == 403 or status_code == 429:
-        print("hit rate limit. breaking")
+        print("hit rate limit, wait one hour. breaking")
         return False
     else:
         print(f"status code: {status_code}. breaking")
@@ -82,6 +82,7 @@ def scrape_gh(
     GitHub shares the same structure for issues and PRs
     Note: not tested for only open issues for example
     """
+    from datetime import date
     import requests
     import json
 
@@ -107,7 +108,7 @@ def scrape_gh(
                 break
 
             for content_type in content_types:
-                folder = f"{repo}_{state}_{content_type}"
+                folder = f"snapshot_{date.today()}/{repo}_{state}_{content_type}"
                 os.makedirs(folder, exist_ok=True)
                 if content_type == "issues":
                     endpoint = "issues"
@@ -148,6 +149,29 @@ def scrape_gh(
                         # This contains information on cross posting issues or prs
                         with open(filename, "w") as f:
                             json.dump(detail_response_json, f, indent=4)
+                        if content_type == "prs":
+                            # Grab the PR comments
+                            comments_folder = f"{folder}/{content_type[:-1]}_comments_{padded_number}.json"
+                            if os.path.exists(comments_folder):
+                                continue
+                            else:
+                                comments_url = (
+                                    f"{GH_API_URL_PREFIX}{endpoint}/{number}/comments"
+                                )
+                                comments_response = requests.get(
+                                    comments_url, headers=headers, timeout=10
+                                )
+                                if not status_code_checks(
+                                    comments_response.status_code
+                                ):
+                                    break
+                                comments_response_json = comments_response.json()
+                                if not json_content_check(comments_response_json):
+                                    break
+
+                                with open(comments_folder, "w") as f:
+                                    json.dump(comments_response_json, f, indent=4)
+            page += 1
     return None
 
 
@@ -155,6 +179,12 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--states", nargs="+", type=str, default=["open", "closed"])
+    parser.add_argument(
+        "--content_types", nargs="+", type=str, default=["issues", "prs"]
+    )
     parser.add_argument("--verbose", type=str, default=False)
     args = parser.parse_args()
-    scrape_gh(verbose=args.verbose)
+    scrape_gh(
+        states=args.states, content_types=args.content_types, verbose=args.verbose
+    )
