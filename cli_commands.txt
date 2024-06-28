@@ -5,7 +5,7 @@ pipx install cruft uv
 
 # Fill in the template like below
 cruft create git@github.com:raybellwaves/github-issue-explorer.git
-dask, dask, openai
+dask, dask, openai, ENTER
 
 # Create an environment for development
 mamba create -n gie python=3.11 --y && \

@@ -133,3 +133,7 @@ def scrape_gh(
                         with open(filename, "w") as f:
                             json.dump(detail_response_json, f, indent=4)
     return None
+
+
+if __name__ == "__main__":
+    scrape_gh()
