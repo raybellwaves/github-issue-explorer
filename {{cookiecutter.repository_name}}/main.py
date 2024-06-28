@@ -105,40 +105,31 @@ def scrape_gh(
             if not json_content_check(page_issues_or_prs):
                 break
 
-            if "issues" in content_types:
-                issues_folder = f"{repo}_{state}_issues"
-                os.makedirs(issues_folder, exist_ok=True)
-                issues = []
-                for issue_or_pr in page_issues_or_prs:
-                    if "pull_request" not in issue_or_pr:
-                        issues.append(issue_or_pr)
-                for issue in tqdm(issues, "fetching issues"):
-                    issue_number = issue["number"]
-                    issue_detail_url = f'{url.split("?")[0]}/{issue_number}'
-                    padded_issue_number = f"{issue_number:06d}"
-                    issue_filename = (
-                        f"{issues_folder}/issue_detail_{padded_issue_number}.json"
+            for content_type in content_types:
+                folder = f"{repo}_{state}_{content_type}"
+                os.makedirs(folder, exist_ok=True)
+                for issue_or_pr in tqdm(page_issues_or_prs, f"fetching {content_type}"):
+                    if "pull_request" in issue_or_pr:
+                        endpoint = "pulls"
+                    else:
+                        endpoint = "issues"
+                    number = issue_or_pr["number"]
+                    padded_number = f"{number:06d}"
+                    filename = (
+                        f"{folder}/{content_type[:-1]}_detail_{padded_number}.json"
                     )
-                    if os.path.exists(issue_filename):
+                    if os.path.exists(filename):
                         continue
                     else:
-                        issue_detail_response = requests.get(
-                            issue_detail_url, headers=headers
-                        )
-                        if not status_code_checks(issue_detail_response.status_code):
+                        detail_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}"
+                        detail_response = requests.get(detail_url, headers=headers)
+                        if not status_code_checks(detail_response.status_code):
                             break
-                        issue_detail_response_json = issue_detail_response.json()
-                        if not json_content_check(issue_detail_response_json):
+                        detail_response_json = detail_response.json()
+                        if not json_content_check(detail_response_json):
                             break
                         # There is also a timeline API that could be included.
                         # This contains information on cross posting issues or prs
-                        with open(issue_filename, "w") as f:
-                            json.dump(issue_detail_response_json, f, indent=4)
-
-            # if "prs" in content_types:
-            # prs_folder = f"{repo}_{state}_prs"
-            # os.makedirs(prs_folder, exist_ok=True)
-            # prs = []
-            #     for issue_or_pr in page_issues_or_prs:
-            #         if "pull_request" in issue_or_pr:
-            #             prs.append(issue_or_pr)
+                        with open(filename, "w") as f:
+                            json.dump(detail_response_json, f, indent=4)
+    return None
