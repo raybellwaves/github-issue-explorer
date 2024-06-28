@@ -24,6 +24,7 @@ pandasai
 pyarrow
 pymilvus[model]
 python-Levenshtein
+ruff
 streamlit
 streamlit-authenticator
 streamlit-folium

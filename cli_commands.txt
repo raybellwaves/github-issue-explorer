@@ -1,0 +1,12 @@
+# Because a Makefile is an overkill for this
+
+# Install cruft and uv on your system however you prefer e.g. in you "base" env
+pipx install cruft uv
+
+# Create an environment for development
+mamba create -n gie python=3.11 --y && \
+  conda activate gie && \
+  uv pip install -r requirements-dev.txt --find-links https://download.pytorch.org/whl/cpu
+
+# Delete this environment
+conda remove --name gie --all --y
