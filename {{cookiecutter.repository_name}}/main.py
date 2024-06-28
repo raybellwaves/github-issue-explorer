@@ -75,6 +75,7 @@ def scrape_gh(
     repo: str = REPO,
     states: list[str] = ["open", "closed"],
     content_types: list[str] = ["issues", "prs"],
+    verbose: bool = False,
 ) -> None:
     """
     Puts data into 4 folders: open_issues, closed_issues, open_prs, closed_prs
@@ -133,6 +134,8 @@ def scrape_gh(
                         continue
                     else:
                         detail_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}"
+                        if verbose:
+                            print(detail_url)
                         detail_response = requests.get(detail_url, headers=headers)
                         if not status_code_checks(detail_response.status_code):
                             break
@@ -147,4 +150,9 @@ def scrape_gh(
 
 
 if __name__ == "__main__":
-    scrape_gh()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verbose", type=str, default=False)
+    args = parser.parse_args()
+    scrape_gh(verbose=args.verbose)

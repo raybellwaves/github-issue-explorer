@@ -16,4 +16,5 @@ mamba create -n gie python=3.11 --y && \
 conda remove --name gie --all --y
 
 # Run the python script
-python main.py
+cd {{cookiecutter.github_repository}}-issue-explorer
+python main.py --verbose
