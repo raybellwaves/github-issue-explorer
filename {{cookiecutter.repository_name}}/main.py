@@ -108,11 +108,22 @@ def scrape_gh(
             for content_type in content_types:
                 folder = f"{repo}_{state}_{content_type}"
                 os.makedirs(folder, exist_ok=True)
-                for issue_or_pr in tqdm(page_issues_or_prs, f"fetching {content_type}"):
-                    if "pull_request" in issue_or_pr:
-                        endpoint = "pulls"
-                    else:
-                        endpoint = "issues"
+                if content_type == "issues":
+                    endpoint = "issues"
+                    page_issues_or_prs_filtered = [
+                        issue
+                        for issue in page_issues_or_prs
+                        if "pull_request" not in issue
+                    ]
+                else:
+                    endpoint = "pulls"
+                    page_issues_or_prs_filtered = [
+                        issue for issue in page_issues_or_prs if "pull_request" in issue
+                    ]
+
+                for issue_or_pr in tqdm(
+                    page_issues_or_prs_filtered, f"fetching {content_type}"
+                ):
                     number = issue_or_pr["number"]
                     padded_number = f"{number:06d}"
                     filename = (

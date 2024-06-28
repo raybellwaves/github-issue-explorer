@@ -14,3 +14,6 @@ mamba create -n gie python=3.11 --y && \
 
 # Delete this environment
 conda remove --name gie --all --y
+
+# Run the python script
+python main.py
