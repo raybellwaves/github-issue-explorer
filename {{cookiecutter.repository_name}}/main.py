@@ -130,6 +130,8 @@ def scrape_gh(
                         issue_detail_response_json = issue_detail_response.json()
                         if not json_content_check(issue_detail_response_json):
                             break
+                        # There is also a timeline API that could be included.
+                        # This contains information on cross posting issues or prs
                         with open(issue_filename, "w") as f:
                             json.dump(issue_detail_response_json, f, indent=4)
 
