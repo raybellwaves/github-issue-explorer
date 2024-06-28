@@ -57,4 +57,4 @@ def scrape_gh(org: str = ORG, repo: str = REPO) -> None:
 
     from tqdm.auto import tqdm
     open_issues_folder = f"{repo}_open_issues"
-    open_issues_folder = f"{repo}_open_issues"
+    closed_issues_folder = f"{repo}_closed_issues"
