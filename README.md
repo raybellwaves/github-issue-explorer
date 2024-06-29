@@ -37,10 +37,18 @@ mamba create -n gie python=3.11 --y && \
 conda remove --name gie --all --y
 ```
 
+Just scrape open issues:
 ```
 cd {{cookiecutter.github_repository}}-issue-explorer
 python main.py --states open --content_types issues --verbose True
 ```
+
+Scrape open and closed issues and open and closed prs
+```
+cd {{cookiecutter.github_repository}}-issue-explorer
+python main.py --states open --content_types issues --verbose True
+```
+
 
 ## TODO
 
