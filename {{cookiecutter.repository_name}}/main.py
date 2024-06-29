@@ -175,6 +175,43 @@ def scrape_gh(
     return None
 
 
+def concat_files(
+    repo: str = REPO,
+    states: list[str] = ["open", "closed"],
+    content_types: list[str] = ["issues", "prs"],
+    llm_cols: bool = True,
+    verbose: bool = False,
+) -> None:
+    from datetime import date
+    import json
+    import os
+    import pandas as pd
+
+    from tqdm.auto import tqdm
+
+    for state in states:
+        for content_type in content_types:
+            folder = f"snapshot_{date.today()}/{repo}_{state}_{content_type}"
+            files = os.listdir(folder)
+            df = pd.DataFrame()
+            for file in tqdm(files):
+                with open(file, "r") as f:
+                    data = json.load(f)
+                _df = pd.json_normalize(data)
+                if _df["body"][0] is None:
+                    _df["body"] = ""
+                _df["label_names"] = _df["labels"].apply(
+                    lambda x: [label["name"] for label in x]
+                    if isinstance(x, list)
+                    else []
+                )
+                if llm_cols:
+                    _df["LLM_title_subject"] = chat_response(
+                        "Give me a one word summary of the following GitHub "
+                        f"{repo} {content_type[:-1]} title: {_df['title'][0]}"
+                    )
+
+
 if __name__ == "__main__":
     import argparse
 

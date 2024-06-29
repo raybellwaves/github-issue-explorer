@@ -21,6 +21,11 @@ cruft create git@github.com:raybellwaves/github-issue-explorer.git
 dask, dask, openai, ENTER
 ```
 
+To update your repo with the latest tempo run:
+```
+cruft update
+```
+
 Create an environment for development
 ```
 mamba create -n gie python=3.11 --y && \
