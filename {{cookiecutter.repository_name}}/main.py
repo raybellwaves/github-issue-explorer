@@ -107,6 +107,12 @@ def scrape_gh(
             page_issues_or_prs = response.json()
             if not json_content_check(page_issues_or_prs):
                 break
+            # Exlude bots
+            page_issues_or_prs = [
+                page_issue_or_pr
+                for page_issue_or_pr in page_issues_or_prs
+                if page_issue_or_pr["user"]["login"] not in BOTS
+            ]
 
             for content_type in content_types:
                 folder = f"snapshot_{date.today()}/{repo}_{state}_{content_type}"
