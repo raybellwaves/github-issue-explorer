@@ -6,6 +6,7 @@ LLM_FRAMEWORK = "{{cookiecutter.llm_framework}}"
 
 BOTS = [
     "GPUtester",
+    "codecov[bot]",
     "dependabot[bot]",
     "github-actions[bot]",
     "pre-commit-ci[bot]",
@@ -78,7 +79,8 @@ def scrape_gh(
     verbose: bool = False,
 ) -> None:
     """
-    Puts data into 4 folders: open_issues, closed_issues, open_prs, closed_prs
+    Puts data into 4 folders:
+    open_issues, closed_issues, open_prs, closed_prs
     GitHub shares the same structure for issues and PRs
     Note: not tested for only open issues for example
     """
@@ -96,7 +98,8 @@ def scrape_gh(
         while True:
             # the issues endpoint is misnomer and contains issues and prs.
             # This returns a high level overview of the issue or pr such as:
-            # the user, the body, body reactions e.g. +1 and whether it's a pr or issue
+            # the user, the body, body reactions e.g.
+            # +1 and whether it's a pr or issue
             gh_api_url_suffix = f"issues?state={state}&per_page=100&page={page}"
             if verbose:
                 print(f"{gh_api_url_suffix=}")
@@ -125,11 +128,18 @@ def scrape_gh(
                         for issue in page_issues_or_prs
                         if "pull_request" not in issue
                     ]
-                else:
+                elif content_type == "prs":
+                    pr_comment_folder = f"snapshot_{date.today()}/{state}_prs_comments"
+                    os.makedirs(pr_comment_folder, exist_ok=True)
                     endpoint = "pulls"
                     page_issues_or_prs_filtered = [
-                        issue for issue in page_issues_or_prs if "pull_request" in issue
+                        pr for pr in page_issues_or_prs if "pull_request" in pr
                     ]
+                else:
+                    raise ValueError(
+                        f"Unknown content type: {content_type}. "
+                        "Should be 'issues' or 'prs'"
+                    )
 
                 for issue_or_pr in tqdm(
                     page_issues_or_prs_filtered, f"fetching {state} {content_type}"
@@ -158,27 +168,31 @@ def scrape_gh(
                         with open(filename, "w") as f:
                             json.dump(detail_response_json, f, indent=4)
                         if content_type == "prs":
-                            # Grab the PR comments
-                            comments_folder = f"{folder}/{content_type[:-1]}_comments_{padded_number}.json"
-                            if os.path.exists(comments_folder):
-                                continue
-                            else:
-                                comments_url = (
-                                    f"{GH_API_URL_PREFIX}{endpoint}/{number}/comments"
+                            # Grab the PR comments as they are in a different endpoint
+                            if detail_response_json["comments"] > 0:
+                                filename = (
+                                    f"{pr_comment_folder}/"
+                                    f"comments_{padded_number}.json"
                                 )
-                                comments_response = requests.get(
-                                    comments_url, headers=headers, timeout=10
-                                )
-                                if not _status_code_checks(
-                                    comments_response.status_code
-                                ):
-                                    break
-                                comments_response_json = comments_response.json()
-                                if not _json_content_check(comments_response_json):
-                                    break
+                                if os.path.exists(filename):
+                                    continue
+                                else:
+                                    comments_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}/comments"
+                                    if verbose:
+                                        print(f"{comments_url=}")
+                                    comments_response = requests.get(
+                                        comments_url, headers=headers, timeout=10
+                                    )
+                                    if not _status_code_checks(
+                                        comments_response.status_code
+                                    ):
+                                        break
+                                    comments_response_json = comments_response.json()
+                                    if not _json_content_check(comments_response_json):
+                                        break
 
-                                with open(comments_folder, "w") as f:
-                                    json.dump(comments_response_json, f, indent=4)
+                                    with open(comments_folder, "w") as f:
+                                        json.dump(comments_response_json, f, indent=4)
             page += 1
     return None
 
