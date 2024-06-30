@@ -189,6 +189,7 @@ def scrape_gh(
                                         break
                                     comments_response_json = comments_response.json()
                                     if not _json_content_check(comments_response_json):
+                                        # This may get here on a bot comment
                                         break
 
                                     with open(filename, "w") as f:
