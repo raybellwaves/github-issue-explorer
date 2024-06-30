@@ -191,7 +191,7 @@ def scrape_gh(
                                     if not _json_content_check(comments_response_json):
                                         break
 
-                                    with open(comments_folder, "w") as f:
+                                    with open(filename, "w") as f:
                                         json.dump(comments_response_json, f, indent=4)
             page += 1
     return None
