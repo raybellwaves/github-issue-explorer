@@ -23,8 +23,7 @@ except KeyError:
     GITHUB_API_TOKEN = ""
 
 
-# Helper functions
-def status_code_checks(status_code: int) -> bool:
+def _status_code_checks(status_code: int) -> bool:
     if status_code == 200:
         return True
     elif status_code == 403 or status_code == 429:
@@ -35,7 +34,7 @@ def status_code_checks(status_code: int) -> bool:
         return False
 
 
-def json_content_check(json_content) -> bool:
+def _json_content_check(json_content) -> bool:
     if not json_content:
         print("no content found. breaking")
         return False
@@ -43,7 +42,7 @@ def json_content_check(json_content) -> bool:
         return True
 
 
-def chat_response(content):
+def _chat_response(content):
     from openai import OpenAI
 
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -54,7 +53,7 @@ def chat_response(content):
     return response.choices[0].message.content
 
 
-def num_tokens_from_string(
+def _num_tokens_from_string(
     string: str,
     encoding_name: str = "cl100k_base",
 ) -> int:
@@ -66,7 +65,7 @@ def num_tokens_from_string(
     return num_tokens
 
 
-def agent_response(agent, content):
+def _agent_response(agent, content):
     return agent.invoke(content)["output"]
 
 
@@ -99,13 +98,15 @@ def scrape_gh(
             # This returns a high level overview of the issue or pr such as:
             # the user, the body, body reactions e.g. +1 and whether it's a pr or issue
             gh_api_url_suffix = f"issues?state={state}&per_page=100&page={page}"
+            if verbose:
+                print(f"{gh_api_url_suffix=}")
             url = f"{GH_API_URL_PREFIX}{gh_api_url_suffix}"
             response = requests.get(url, headers=headers)
-            if not status_code_checks(response.status_code):
+            if not _status_code_checks(response.status_code):
                 break
             # list of ~100 issues or prs from most recent to oldest
             page_issues_or_prs = response.json()
-            if not json_content_check(page_issues_or_prs):
+            if not _json_content_check(page_issues_or_prs):
                 break
             # Exlude bots
             page_issues_or_prs = [
@@ -115,7 +116,7 @@ def scrape_gh(
             ]
 
             for content_type in content_types:
-                folder = f"snapshot_{date.today()}/{repo}_{state}_{content_type}"
+                folder = f"snapshot_{date.today()}/{state}_{content_type}"
                 os.makedirs(folder, exist_ok=True)
                 if content_type == "issues":
                     endpoint = "issues"
@@ -143,14 +144,14 @@ def scrape_gh(
                     else:
                         detail_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}"
                         if verbose:
-                            print(detail_url)
+                            print(f"{detail_url=}")
                         detail_response = requests.get(
                             detail_url, headers=headers, timeout=10
                         )
-                        if not status_code_checks(detail_response.status_code):
+                        if not _status_code_checks(detail_response.status_code):
                             break
                         detail_response_json = detail_response.json()
-                        if not json_content_check(detail_response_json):
+                        if not _json_content_check(detail_response_json):
                             break
                         # There is also a timeline API that could be included.
                         # This contains information on cross posting issues or prs
@@ -168,12 +169,12 @@ def scrape_gh(
                                 comments_response = requests.get(
                                     comments_url, headers=headers, timeout=10
                                 )
-                                if not status_code_checks(
+                                if not _status_code_checks(
                                     comments_response.status_code
                                 ):
                                     break
                                 comments_response_json = comments_response.json()
-                                if not json_content_check(comments_response_json):
+                                if not _json_content_check(comments_response_json):
                                     break
 
                                 with open(comments_folder, "w") as f:
