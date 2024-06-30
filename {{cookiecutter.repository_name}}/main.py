@@ -124,7 +124,7 @@ def scrape_gh(
                     ]
 
                 for issue_or_pr in tqdm(
-                    page_issues_or_prs_filtered, f"fetching {content_type}"
+                    page_issues_or_prs_filtered, f"fetching {state} {content_type}"
                 ):
                     number = issue_or_pr["number"]
                     padded_number = f"{number:06d}"
