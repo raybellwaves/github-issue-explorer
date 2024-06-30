@@ -8,6 +8,7 @@ BOTS = [
     "GPUtester",
     "dependabot[bot]",
     "github-actions[bot]",
+    "pre-commit-ci[bot]",
 ]
 
 try:

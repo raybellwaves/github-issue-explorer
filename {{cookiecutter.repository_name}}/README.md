@@ -23,6 +23,8 @@ Scraping github options:
 cd {{cookiecutter.github_repository}}-issue-explorer
 python main.py --states open --content_types issues --verbose True
 python main.py --states closed --content_types issues --verbose True
+python main.py --states open --content_types prs --verbose True
+python main.py --states closed --content_types prs --verbose True
 ```
 
 Scrape open and closed issues and open and closed prs
