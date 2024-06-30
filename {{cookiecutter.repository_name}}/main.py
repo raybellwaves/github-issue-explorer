@@ -78,7 +78,6 @@ def scrape_gh(
     repo: str = REPO,
     states: list[str] = ["open", "closed"],
     content_types: list[str] = ["issues", "prs"],
-    scrape_code_comments: bool = False,
     verbose: bool = False,
 ) -> None:
     """
@@ -170,8 +169,8 @@ def scrape_gh(
                         # This contains information on cross posting issues or prs
                         with open(filename, "w") as f:
                             json.dump(detail_response_json, f, indent=4)
-                        if content_type == "prs" and scrape_code_comments:
-                            # Grab the PR comments as they are in a different endpoint
+                        if content_type == "prs":
+                            # Grab the PR comments as they are in the issue endpoint
                             if detail_response_json["comments"] > 0:
                                 filename = (
                                     f"{pr_comment_folder}/"
@@ -180,7 +179,9 @@ def scrape_gh(
                                 if os.path.exists(filename):
                                     continue
                                 else:
-                                    comments_url = f"{GH_API_URL_PREFIX}{endpoint}/{number}/comments"
+                                    comments_url = (
+                                        f"{GH_API_URL_PREFIX}issues/{number}/comments"
+                                    )
                                     if verbose:
                                         print(f"{comments_url=}")
                                     comments_response = requests.get(
@@ -192,8 +193,7 @@ def scrape_gh(
                                         break
                                     comments_response_json = comments_response.json()
                                     if not _json_content_check(comments_response_json):
-                                        # This may get here on a bot comment
-                                        continue
+                                        break
 
                                     with open(filename, "w") as f:
                                         json.dump(comments_response_json, f, indent=4)
