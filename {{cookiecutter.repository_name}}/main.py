@@ -9,7 +9,9 @@ BOTS = [
     "codecov[bot]",
     "dependabot[bot]",
     "github-actions[bot]",
+    "pep8speaks",
     "pre-commit-ci[bot]",
+    "review-notebook-app[bot]",
 ]
 
 try:
@@ -190,7 +192,7 @@ def scrape_gh(
                                     comments_response_json = comments_response.json()
                                     if not _json_content_check(comments_response_json):
                                         # This may get here on a bot comment
-                                        break
+                                        continue
 
                                     with open(filename, "w") as f:
                                         json.dump(comments_response_json, f, indent=4)
