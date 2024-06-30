@@ -39,7 +39,7 @@ def _status_code_checks(status_code: int) -> bool:
 
 def _json_content_check(json_content) -> bool:
     if not json_content:
-        print("no content found. breaking")
+        print("no content found in response")
         return False
     else:
         return True
@@ -78,6 +78,7 @@ def scrape_gh(
     repo: str = REPO,
     states: list[str] = ["open", "closed"],
     content_types: list[str] = ["issues", "prs"],
+    scrape_code_comments: bool = False,
     verbose: bool = False,
 ) -> None:
     """
@@ -169,7 +170,7 @@ def scrape_gh(
                         # This contains information on cross posting issues or prs
                         with open(filename, "w") as f:
                             json.dump(detail_response_json, f, indent=4)
-                        if content_type == "prs":
+                        if content_type == "prs" and scrape_code_comments:
                             # Grab the PR comments as they are in a different endpoint
                             if detail_response_json["comments"] > 0:
                                 filename = (
