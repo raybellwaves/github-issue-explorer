@@ -18,10 +18,11 @@ mamba create -n gie python=3.11 --y && \
 conda remove --name gie --all --y
 ```
 
-Just scrape open issues:
+Scraping github options:
 ```
 cd {{cookiecutter.github_repository}}-issue-explorer
 python main.py --states open --content_types issues --verbose True
+python main.py --states closed --content_types issues --verbose True
 ```
 
 Scrape open and closed issues and open and closed prs
@@ -29,14 +30,3 @@ Scrape open and closed issues and open and closed prs
 cd {{cookiecutter.github_repository}}-issue-explorer
 python main.py --states open --content_types issues --verbose True
 ```
-
-
-## TODO
-
- - Could include timeline API which links issues/PRs
- - Haven't done anything with PR data
-
- ## See also
-
- - https://devlake.apache.org/
- - https://github.com/dlvhdr/gh-dash
